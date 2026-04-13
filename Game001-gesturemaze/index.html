@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-<title>手势迷宫</title>
+<title>ジェスチャー迷路</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{width:100%;height:100%;overflow:hidden;background:#0a0a1a;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
@@ -116,27 +116,38 @@ canvas{display:block;touch-action:none}
 .tutorial-hint{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.5);font-size:14px;text-align:center;z-index:20;pointer-events:none;animation:hintFade 2s ease-in-out infinite}
 @keyframes hintFade{0%,100%{opacity:.3}50%{opacity:.8}}
 .particle-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:15}
+#loadingScreen{position:absolute;top:0;left:0;width:100%;height:100%;background:#0a0a1a;background-image:url('../images/bg.jpg');background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
+#loadingScreen .logo{font-size:32px;font-weight:bold;margin-bottom:20px;color:#fff}
+#loadingScreen .age-badge{display:inline-block;background:#00c2ff;color:#000;padding:4px 10px;border-radius:4px;font-weight:bold;margin-bottom:10px}
+#loadingScreen .tips{font-size:14px;opacity:0.8;max-width:320px;line-height:1.4;margin-bottom:30px;text-align:center}
+#loadingScreen .loading{font-size:16px;margin-top:20px}
 </style>
 </head>
 <body>
+<div id="loadingScreen">
+  <div class="logo">MHGames</div>
+  <div class="age-badge">8+</div>
+  <div class="tips">This game is suitable for ages 8 and above.<br>Please play in moderation and maintain a healthy lifestyle.</div>
+  <div class="loading">Loading...</div>
+</div>
 
 <div id="homeScreen" class="screen active">
   <div class="home-icons">
     <button class="icon-btn" onclick="showScreen('settingsScreen')">⚙</button>
     <button class="icon-btn" onclick="showScreen('highscoreScreen')">🏆</button>
   </div>
-  <div class="game-title">手势迷宫</div>
+  <div class="game-title">ジェスチャー迷路</div>
   <div class="game-subtitle">Gesture Maze</div>
   <div class="btn-group">
-    <button class="btn btn-primary" onclick="startGame()">开始游戏</button>
-    <button class="btn btn-secondary" onclick="showScreen('levelScreen')">选择关卡</button>
+    <button class="btn btn-primary" onclick="startGame()">ゲームを開始</button>
+    <button class="btn btn-secondary" onclick="showScreen('levelScreen')">ステージを選択</button>
   </div>
-  <div class="home-highscore">最高分: <span id="homeBest">0</span></div>
+  <div class="home-highscore">ハイスコア: <span id="homeBest">0</span></div>
 </div>
 
 <div id="levelScreen" class="screen">
   <button class="icon-btn level-back" onclick="showScreen('homeScreen')">←</button>
-  <div class="level-header">选择关卡</div>
+  <div class="level-header">ステージを選択</div>
   <div class="level-grid" id="levelGrid"></div>
 </div>
 
@@ -147,123 +158,129 @@ canvas{display:block;touch-action:none}
     <div class="hud-left">
       <button class="pause-btn" id="hudActionBtn" onclick="onHudActionBtn()">⏸</button>
       <div>
-        <div class="hud-level" id="hudLevel">关卡 1</div>
+        <div class="hud-level" id="hudLevel">ステージ 1</div>
         <div class="hud-timer" id="hudTimer">00:00</div>
       </div>
       <div class="hud-lives" id="hudLives"><div class="hud-life"></div><div class="hud-life"></div></div>
     </div>
     <div class="hud-right">
-      <div class="hud-score" id="hudScore">得分: 0</div>
+      <div class="hud-score" id="hudScore">スコア: 0</div>
     </div>
   </div>
   <div id="pauseOverlay">
-    <div class="pause-title">暂停</div>
+    <div class="pause-title">一時停止</div>
     <div class="btn-group">
-      <button class="btn btn-primary" onclick="togglePause()">继续游戏</button>
-      <button class="btn btn-secondary" onclick="quitGame()">退出关卡</button>
+      <button class="btn btn-primary" onclick="togglePause()">ゲームを続ける</button>
+      <button class="btn btn-secondary" onclick="quitGame()">ステージを終了</button>
     </div>
   </div>
-  <div class="tutorial-hint" id="tutorialHint">滑动屏幕控制光点移动</div>
+  <div class="tutorial-hint" id="tutorialHint">画面をスワイプして光点を移動</div>
   <div id="resultModal">
     <button class="modal-close" onclick="closeResultModal()">✕</button>
     <div class="modal-content">
-      <div class="modal-title" id="modalTitle">通关成功!</div>
-      <div class="modal-subtitle" id="modalSubtitle">你成功走出了迷宫</div>
+      <div class="modal-title" id="modalTitle">クリア!</div>
+      <div class="modal-subtitle" id="modalSubtitle">迷路を抜け出しました</div>
       <div class="modal-stars" id="modalStars">★★★</div>
       <div class="modal-score" id="modalScore">0</div>
-      <div class="modal-score-label">综合得分</div>
+      <div class="modal-score-label">総合得点</div>
       <div class="modal-stats">
-        <div class="modal-stat"><div class="modal-stat-val" id="modalStatTime">00:00</div><div class="modal-stat-lbl">用时</div></div>
-        <div class="modal-stat"><div class="modal-stat-val" id="modalStatPath">0</div><div class="modal-stat-lbl">路径长度</div></div>
-        <div class="modal-stat"><div class="modal-stat-val" id="modalStatHits">0</div><div class="modal-stat-lbl">碰撞次数</div></div>
+        <div class="modal-stat"><div class="modal-stat-val" id="modalStatTime">00:00</div><div class="modal-stat-lbl">所要時間</div></div>
+        <div class="modal-stat"><div class="modal-stat-val" id="modalStatPath">0</div><div class="modal-stat-lbl">経路長</div></div>
+        <div class="modal-stat"><div class="modal-stat-val" id="modalStatHits">0</div><div class="modal-stat-lbl">衝突回数</div></div>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-success" id="modalNextBtn" onclick="goToNextLevel()">下一关</button>
-        <button class="btn btn-secondary" onclick="closeResultModal()">继续欣赏烟花</button>
+        <button class="btn btn-success" id="modalNextBtn" onclick="goToNextLevel()">次のステージ</button>
+        <button class="btn btn-secondary" onclick="closeResultModal()">花火を鑑賞</button>
       </div>
     </div>
   </div>
 </div>
 
 <div id="successScreen" class="screen">
-  <div class="success-title">通关成功!</div>
-  <div class="success-subtitle">你成功走出了迷宫</div>
+  <div class="success-title">クリア!</div>
+  <div class="success-subtitle">迷路を抜け出しました</div>
   <div class="stars-display" id="starsDisplay">★★★</div>
   <div class="score-display" id="finalScore">0</div>
-  <div class="score-label">综合得分</div>
+  <div class="score-label">総合得点</div>
   <div class="stats-row">
-    <div class="stat-item"><div class="stat-value" id="statTime">00:00</div><div class="stat-label">用时</div></div>
-    <div class="stat-item"><div class="stat-value" id="statPath">0</div><div class="stat-label">路径长度</div></div>
-    <div class="stat-item"><div class="stat-value" id="statHits">0</div><div class="stat-label">碰撞次数</div></div>
+    <div class="stat-item"><div class="stat-value" id="statTime">00:00</div><div class="stat-label">所要時間</div></div>
+    <div class="stat-item"><div class="stat-value" id="statPath">0</div><div class="stat-label">経路長</div></div>
+    <div class="stat-item"><div class="stat-value" id="statHits">0</div><div class="stat-label">衝突回数</div></div>
   </div>
   <div class="btn-group">
-    <button class="btn btn-success" onclick="nextLevel()">下一关</button>
-    <button class="btn btn-secondary" onclick="showScreen('levelScreen')">关卡选择</button>
-    <button class="btn btn-secondary" onclick="showScreen('homeScreen')">返回首页</button>
+    <button class="btn btn-success" onclick="nextLevel()">次のステージ</button>
+    <button class="btn btn-secondary" onclick="showScreen('levelScreen')">ステージを選択</button>
+    <button class="btn btn-secondary" onclick="showScreen('homeScreen')">ホームに戻る</button>
   </div>
 </div>
 
 <div id="failScreen" class="screen">
-  <div class="fail-title">挑战失败</div>
-  <div class="fail-subtitle">光点触碰了迷宫墙壁</div>
+  <div class="fail-title">挑戦失敗</div>
+  <div class="fail-subtitle">光点が迷路の壁に衝突しました</div>
   <div class="btn-group">
-    <button class="btn btn-primary" onclick="retryLevel()">重新挑战</button>
-    <button class="btn btn-danger" onclick="showAdRevive()">观看广告复活</button>
-    <button class="btn btn-secondary" onclick="showScreen('levelScreen')">关卡选择</button>
+    <button class="btn btn-primary" onclick="retryLevel()">再チャレンジ</button>
+    <button class="btn btn-danger" onclick="showAdRevive()">広告を視聴して復活</button>
+    <button class="btn btn-secondary" onclick="showScreen('levelScreen')">ステージを選択</button>
   </div>
 </div>
 
 <div id="settingsScreen" class="screen">
   <button class="icon-btn level-back" onclick="showScreen('homeScreen')">←</button>
-  <div class="settings-header">设置</div>
+  <div class="settings-header">設定</div>
   <div class="settings-list">
     <div class="setting-item">
-      <div class="setting-label">🔊 音效</div>
+      <div class="setting-label">🔊 効果音</div>
       <button class="toggle on" id="toggleSfx" onclick="toggleSetting('sfx')"></button>
     </div>
     <div class="setting-item">
-      <div class="setting-label">🎵 音乐</div>
+      <div class="setting-label">🎵 音楽</div>
       <button class="toggle on" id="toggleMusic" onclick="toggleSetting('music')"></button>
     </div>
     <div class="setting-item">
-      <div class="setting-label">📳 振动反馈</div>
+      <div class="setting-label">📳 振動フィードバック</div>
       <button class="toggle on" id="toggleVibrate" onclick="toggleSetting('vibrate')"></button>
     </div>
     <div class="setting-item">
-      <div class="setting-label">🎨 画质</div>
+      <div class="setting-label">🎨 画質</div>
       <div class="quality-select">
         <button class="quality-opt" onclick="setQuality('low')">低</button>
         <button class="quality-opt active" onclick="setQuality('mid')">中</button>
         <button class="quality-opt" onclick="setQuality('high')">高</button>
       </div>
     </div>
+    <div class="setting-item">
+      <div class="setting-label" onclick="window.open('../privacy.html', '_blank')">🔒 プライバシーポリシー</div>
+    </div>
+    <div class="setting-item">
+      <div class="setting-label" onclick="window.open('../terms.html', '_blank')">📄 利用規約</div>
+    </div>
   </div>
 </div>
 
 <div id="highscoreScreen" class="screen">
   <button class="icon-btn level-back" onclick="showScreen('homeScreen')">←</button>
-  <div class="hs-header">高分榜</div>
+  <div class="hs-header">ハイスコア</div>
   <div class="hs-list" id="hsList"></div>
 </div>
 
 <div id="adOverlay">
-  <div class="ad-title">观看广告获得复活机会</div>
+  <div class="ad-title">広告を視聴して復活チャンスを獲得</div>
   <div class="ad-box"></div>
   <div class="ad-progress"><div class="ad-progress-bar" id="adProgressBar"></div></div>
-  <div class="ad-skip" id="adSkipText">广告播放中...</div>
+  <div class="ad-skip" id="adSkipText">広告再生中...</div>
 </div>
 
 <script>
 const LEVELS = [
-  { id:1, name:'初入迷途', cols:5, rows:5, timeLimit:60 },
-  { id:2, name:'曲径通幽', cols:6, rows:6, timeLimit:75 },
-  { id:3, name:'柳暗花明', cols:7, rows:7, timeLimit:90 },
-  { id:4, name:'迷雾森林', cols:8, rows:8, timeLimit:105 },
-  { id:5, name:'暗夜寻路', cols:9, rows:9, timeLimit:120 },
-  { id:6, name:'星河迷踪', cols:10, rows:10, timeLimit:135 },
-  { id:7, name:'幻境迷宫', cols:11, rows:11, timeLimit:150 },
-  { id:8, name:'时空裂隙', cols:12, rows:12, timeLimit:165 },
-  { id:9, name:'无尽深渊', cols:13, rows:13, timeLimit:180 }
+  { id:1, name:'迷宮入り口', cols:5, rows:5, timeLimit:60 },
+  { id:2, name:'曲がりくねった道', cols:6, rows:6, timeLimit:75 },
+  { id:3, name:'柳の陰から明るさ', cols:7, rows:7, timeLimit:90 },
+  { id:4, name:'霞の森', cols:8, rows:8, timeLimit:105 },
+  { id:5, name:'暗夜の道', cols:9, rows:9, timeLimit:120 },
+  { id:6, name:'星の迷路', cols:10, rows:10, timeLimit:135 },
+  { id:7, name:'幻の迷宮', cols:11, rows:11, timeLimit:150 },
+  { id:8, name:'時空の裂け目', cols:12, rows:12, timeLimit:165 },
+  { id:9, name:'無限の深淵', cols:13, rows:13, timeLimit:180 }
 ];
 
 let settings = { sfx:true, music:true, vibrate:true, quality:'mid' };
@@ -649,9 +666,9 @@ function startGame() {
     });
   }
 
-  document.getElementById('hudLevel').textContent = `关卡 ${lv.id} · ${lv.name}`;
+  document.getElementById('hudLevel').textContent = `ステージ ${lv.id} · ${lv.name}`;
   document.getElementById('hudTimer').textContent = '00:00';
-  document.getElementById('hudScore').textContent = '得分: 0';
+  document.getElementById('hudScore').textContent = 'スコア: 0';
   document.getElementById('tutorialHint').style.display = 'block';
   document.getElementById('pauseOverlay').classList.remove('active');
 
@@ -704,7 +721,7 @@ function updateLiveScore() {
   const pathFactor = Math.max(0, 1 - (gameState.pathLength / pathOptimal - 0.5));
   const hitPenalty = gameState.hitCount * 50;
   const liveScore = Math.min(1000, Math.max(0, Math.round(500 + timeFactor * 400 + pathFactor * 100 - hitPenalty - gameState.scoreDecay)));
-  document.getElementById('hudScore').textContent = `得分: ${liveScore}`;
+  document.getElementById('hudScore').textContent = `スコア: ${liveScore}`;
 }
 
 function renderGame() {
@@ -1538,6 +1555,18 @@ function formatTime(seconds) {
 
 loadSettings();
 updateHomeBest();
+
+(function() {
+  const loadingScreen = document.getElementById('loadingScreen');
+  const timeout = setTimeout(function() {
+    loadingScreen.style.display = 'none';
+  }, 5000);
+  
+  window.addEventListener('load', function() {
+    clearTimeout(timeout);
+    loadingScreen.style.display = 'none';
+  });
+})();
 
 (function homeBgAnim() {
   const c = document.createElement('canvas');
