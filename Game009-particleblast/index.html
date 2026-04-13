@@ -450,10 +450,60 @@
             transform: scale(1.1);
             box-shadow: 0 0 40px rgba(0, 245, 212, 0.8);
         }
+
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        #loadingScreen .logo {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        #loadingScreen .age-badge {
+            display: inline-block;
+            background: #00c2ff;
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        #loadingScreen .tips {
+            font-size: 14px;
+            opacity: 0.8;
+            max-width: 320px;
+            line-height: 1.4;
+            margin-bottom: 30px;
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+        }
+        #loadingScreen .loading {
+            font-size: 16px;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.6);
+        }
     </style>
 </head>
 <body>
-    <div class="home-screen" id="homeScreen">
+<div id="loadingScreen">
+    <div class="logo">MHGames</div>
+    <div class="age-badge">8+</div>
+    <div class="tips">This game is suitable for ages 8 and above.<br>Please play in moderation and maintain a healthy lifestyle.</div>
+    <div class="loading">Loading...</div>
+</div>
+
+<div class="home-screen" id="homeScreen">
         <h1 class="game-title" data-i18n="title">Particle Blast</h1>
         <div class="lang-select">
             <button class="lang-button active" data-lang="en">English</button>
@@ -469,6 +519,10 @@
         <div class="game-buttons">
             <button class="game-btn btn-mining" id="startButton" data-i18n="startGame">Start</button>
             <button class="game-btn btn-tiktok" id="tiktokButton" data-i18n="shareTikTok">Share to TikTok</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;z-index:1;">
+            <div style="color:rgba(255,255,255,0.6);font-size:clamp(12px,3vw,14px);cursor:pointer;transition:color 0.3s;" onclick="window.open('../privacy.html', '_blank')">プライバシーポリシー</div>
+            <div style="color:rgba(255,255,255,0.6);font-size:clamp(12px,3vw,14px);cursor:pointer;transition:color 0.3s;" onclick="window.open('../terms.html', '_blank')">利用規約</div>
         </div>
     </div>
 
@@ -515,6 +569,18 @@
         document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
         document.addEventListener('gestureend', function(e) { e.preventDefault(); });
         document.addEventListener('dblclick', function(e) { e.preventDefault(); });
+    </script>
+    <script>
+        (function() {
+            var loadingScreen = document.getElementById('loadingScreen');
+            var timeout = setTimeout(function() {
+                loadingScreen.style.display = 'none';
+            }, 5000);
+            window.addEventListener('load', function() {
+                clearTimeout(timeout);
+                loadingScreen.style.display = 'none';
+            });
+        })();
     </script>
     <script src="game.js"></script>
 </body>

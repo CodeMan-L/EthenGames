@@ -9,7 +9,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
+<div id="loadingScreen">
+    <div class="logo">MHGames</div>
+    <div class="age-badge">8+</div>
+    <div class="tips">This game is suitable for ages 8 and above.<br>Please play in moderation and maintain a healthy lifestyle.</div>
+    <div class="loading">Loading...</div>
+</div>
+
+<div id="app">
         <div id="home-screen" class="screen active">
             <div class="neon-title">
                 <h1>ネオン数字マージ</h1>
@@ -98,6 +105,12 @@
                 <div class="setting-item">
                     <button id="btn-reset" class="neon-btn danger">進捗リセット</button>
                 </div>
+                <div class="setting-item">
+                    <span class="setting-label" style="cursor:pointer;" onclick="window.open('../privacy.html', '_blank')">プライバシーポリシー</span>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label" style="cursor:pointer;" onclick="window.open('../terms.html', '_blank')">利用規約</span>
+                </div>
             </div>
         </div>
     </div>
@@ -139,6 +152,18 @@
             const game = new Game2048();
             game.init();
         });
+    </script>
+    <script>
+        (function() {
+            var loadingScreen = document.getElementById('loadingScreen');
+            var timeout = setTimeout(function() {
+                loadingScreen.style.display = 'none';
+            }, 5000);
+            window.addEventListener('load', function() {
+                clearTimeout(timeout);
+                loadingScreen.style.display = 'none';
+            });
+        })();
     </script>
 </body>
 </html>
