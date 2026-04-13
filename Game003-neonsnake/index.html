@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>霓虹蛇道 - Neon Snake Dojo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- HOME -->
+        <div id="screen-home" class="screen active">
+            <div class="screen-content center-content">
+                <h1 class="neon-title">ネオンヘビ</h1>
+                <p class="neon-subtitle">霓虹蛇道</p>
+                <div class="menu-buttons">
+                    <button id="btn-start" class="btn btn-primary">スタート</button>
+                    <button id="btn-levels" class="btn btn-secondary">レベル選択</button>
+                    <button id="btn-skin" class="btn btn-secondary">スキン</button>
+                    <button id="btn-settings" class="btn btn-secondary">設定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEVEL SELECT -->
+        <div id="screen-levels" class="screen">
+            <div class="screen-content">
+                <div class="screen-header">
+                    <button class="btn-back" id="btn-back-levels">←</button>
+                    <h2>レベル選択</h2>
+                </div>
+                <div class="level-grid">
+                    <div class="level-card" data-level="1">
+                        <div class="level-name">初級</div>
+                        <div class="level-sub">のんびり散歩</div>
+                        <div class="level-best">🔒</div>
+                    </div>
+                    <div class="level-card" data-level="2">
+                        <div class="level-name">中級</div>
+                        <div class="level-sub">障害物回避</div>
+                        <div class="level-best">🔒</div>
+                    </div>
+                    <div class="level-card" data-level="3">
+                        <div class="level-name">高級</div>
+                        <div class="level-sub">終極挑戦</div>
+                        <div class="level-best">🔒</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME -->
+        <div id="screen-game" class="screen">
+            <div class="game-hud">
+                <span id="hud-level" class="hud-item">LV1</span>
+                <span id="hud-target" class="hud-item neon-pink">0/200</span>
+                <span class="hud-item">スコア: <span id="hud-score" class="neon-blue">0</span></span>
+                <button id="btn-pause" class="btn-icon">⏸</button>
+                <button id="btn-sound" class="btn-icon">🔊</button>
+            </div>
+            <div id="invincible-indicator" class="invincible-bar hidden">
+                無敵 <span id="invincible-timer">3</span>秒
+            </div>
+            <div class="canvas-container">
+                <canvas id="game-canvas"></canvas>
+            </div>
+            <div class="touch-controls">
+                <button class="ctrl-btn" id="ctrl-up">▲</button>
+                <div class="ctrl-row">
+                    <button class="ctrl-btn" id="ctrl-left">◀</button>
+                    <button class="ctrl-btn" id="ctrl-down">▼</button>
+                    <button class="ctrl-btn" id="ctrl-right">▶</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAUSE -->
+        <div id="screen-pause" class="screen overlay-screen">
+            <div class="overlay-content">
+                <h2 class="neon-text">一時停止</h2>
+                <button id="btn-resume" class="btn btn-primary">再開</button>
+                <button id="btn-quit" class="btn btn-secondary">終了</button>
+            </div>
+        </div>
+
+        <!-- GAME OVER -->
+        <div id="screen-gameover" class="screen overlay-screen">
+            <div class="overlay-content">
+                <h2 class="neon-text neon-pink">ゲームオーバー</h2>
+                <div class="score-display">
+                    <div>スコア: <span id="over-score" class="neon-blue">0</span></div>
+                    <div>最高: <span id="over-best" class="neon-purple">0</span></div>
+                </div>
+                <button id="btn-revive" class="btn btn-primary">広告を見て復活 <span id="respawn-countdown"></span></button>
+                <button id="btn-home-over" class="btn btn-secondary">ホーム</button>
+            </div>
+        </div>
+
+        <!-- VICTORY -->
+        <div id="screen-victory" class="screen overlay-screen">
+            <div class="overlay-content">
+                <h2 class="neon-text neon-green">クリア！</h2>
+                <div id="victory-level" class="neon-purple">LV1 初級</div>
+                <div class="score-display">
+                    スコア: <span id="victory-score" class="neon-blue">0</span>
+                </div>
+                <button id="btn-next" class="btn btn-primary">次へ</button>
+                <button id="btn-home-victory" class="btn btn-secondary">ホーム</button>
+            </div>
+        </div>
+
+        <!-- SKIN -->
+        <div id="screen-skin" class="screen">
+            <div class="screen-content skin-scroll">
+                <div class="screen-header">
+                    <button class="btn-back" id="btn-back-skin">←</button>
+                    <h2>スキン</h2>
+                </div>
+                <div class="skin-section">
+                    <h3>プリセット</h3>
+                    <div id="preset-list" class="preset-grid"></div>
+                </div>
+                <div class="skin-section">
+                    <h3>カスタム色</h3>
+                    <p class="hint">タップ→頭色 / ドラッグ→適用先</p>
+                    <div id="custom-colors" class="color-grid"></div>
+                </div>
+                <div class="skin-section">
+                    <h3>適用先</h3>
+                    <div class="slot-row">
+                        <div class="skin-slot" id="slot-head" data-part="head">
+                            <span class="slot-label">頭</span>
+                        </div>
+                        <div class="skin-slot" id="slot-body" data-part="body">
+                            <span class="slot-label">体</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skin-section">
+                    <h3>透明度</h3>
+                    <div class="opacity-row">
+                        <label>頭 <input type="range" id="opacity-head" min="10" max="100" value="100"> <span id="opacity-head-val">100%</span></label>
+                    </div>
+                    <div class="opacity-row">
+                        <label>体 <input type="range" id="opacity-body" min="10" max="100" value="100"> <span id="opacity-body-val">100%</span></label>
+                    </div>
+                </div>
+                <div class="skin-section">
+                    <h3>プレビュー</h3>
+                    <div class="preview-snake">
+                        <span class="preview-head"></span>
+                        <span class="preview-body"></span>
+                        <span class="preview-body"></span>
+                        <span class="preview-body"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="screen-settings" class="screen">
+            <div class="screen-content">
+                <div class="screen-header">
+                    <button class="btn-back" id="btn-back-settings">←</button>
+                    <h2>設定</h2>
+                </div>
+                <div class="settings-list">
+                    <div class="setting-row">
+                        <span>BGM</span>
+                        <input type="range" id="bgm-slider" min="0" max="100" value="50">
+                        <span id="bgm-val">50%</span>
+                    </div>
+                    <div class="setting-row">
+                        <span>効果音</span>
+                        <input type="range" id="sfx-slider" min="0" max="100" value="100">
+                        <span id="sfx-val">100%</span>
+                    </div>
+                    <button id="btn-reset" class="btn btn-danger">データリセット</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AD MODAL -->
+        <div id="ad-modal" class="modal hidden">
+            <div class="modal-content">
+                <div id="ad-content">広告を読み込み中...</div>
+                <div id="ad-timer" class="ad-countdown">3</div>
+            </div>
+        </div>
+
+        <!-- RESET MODAL -->
+        <div id="reset-modal" class="modal hidden">
+            <div class="modal-content">
+                <p>本当にリセットしますか？</p>
+                <div class="modal-buttons">
+                    <button id="btn-cancel-reset" class="btn btn-secondary">キャンセル</button>
+                    <button id="btn-confirm-reset" class="btn btn-danger">確定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/snake.js"></script>
+    <script src="js/food.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/adapter.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

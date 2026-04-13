@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>霓虹旋转飞刀 | Neon Knife</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="home-screen" class="screen active">
+            <div class="neon-title">
+                <h1>霓虹旋转飞刀</h1>
+                <p class="subtitle">NEON KNIFE</p>
+            </div>
+            
+            <div class="score-display">
+                <div class="score-item">
+                    <span class="label">最高分</span>
+                    <span id="high-score" class="value">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="label">最高关卡</span>
+                    <span id="max-level" class="value">1</span>
+                </div>
+            </div>
+            
+            <div class="menu-buttons">
+                <button id="btn-start" class="neon-btn primary">
+                    <span>开始游戏</span>
+                </button>
+                <button id="btn-levels" class="neon-btn">
+                    <span>关卡选择</span>
+                </button>
+                <button id="btn-settings" class="neon-btn">
+                    <span>设置</span>
+                </button>
+                <button id="btn-share" class="neon-btn">
+                    <span>分享TikTok</span>
+                </button>
+            </div>
+            
+            <div class="sound-toggle">
+                <button id="btn-sound" class="icon-btn">
+                    <span id="sound-icon">🔊</span>
+                </button>
+            </div>
+        </div>
+        
+        <div id="settings-screen" class="screen">
+            <div class="screen-header">
+                <h2>设置</h2>
+            </div>
+            
+            <div class="settings-content">
+                <div class="setting-item">
+                    <span class="setting-label">音效</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-sfx" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <span class="setting-label">背景音乐</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-bgm" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <button id="btn-reset" class="neon-btn danger">
+                    <span>重置进度</span>
+                </button>
+            </div>
+            
+            <button id="btn-back-settings" class="neon-btn">
+                <span>返回</span>
+            </button>
+        </div>
+        
+        <div id="levels-screen" class="screen">
+            <div class="screen-header">
+                <h2>关卡选择</h2>
+            </div>
+            
+            <div id="levels-grid" class="levels-grid">
+            </div>
+            
+            <button id="btn-back-levels" class="neon-btn">
+                <span>返回</span>
+            </button>
+        </div>
+        
+        <div id="game-screen" class="screen">
+            <div class="game-hud">
+                <div class="hud-left">
+                    <button id="btn-pause" class="icon-btn">⏸</button>
+                </div>
+                <div class="hud-center">
+                    <span id="current-level">关卡 1</span>
+                </div>
+                <div class="hud-right">
+                    <span id="knife-count">飞刀: 5</span>
+                </div>
+            </div>
+            
+            <div id="game-info">
+                <div class="info-item">
+                    <span>得分</span>
+                    <span id="game-score">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="pause-modal" class="modal">
+            <div class="modal-content">
+                <h3>暂停</h3>
+                <button id="btn-resume" class="neon-btn primary">
+                    <span>继续</span>
+                </button>
+                <button id="btn-restart-pause" class="neon-btn">
+                    <span>重新开始</span>
+                </button>
+                <button id="btn-home" class="neon-btn">
+                    <span>返回首页</span>
+                </button>
+            </div>
+        </div>
+        
+        <div id="gameover-modal" class="modal">
+            <div class="modal-content">
+                <h3>游戏失败</h3>
+                <p id="fail-message">飞刀碰撞了！</p>
+                <button id="btn-revive" class="neon-btn primary">
+                    <span>看广告复活</span>
+                </button>
+                <button id="btn-restart" class="neon-btn">
+                    <span>重新开始</span>
+                </button>
+            </div>
+        </div>
+        
+        <div id="victory-modal" class="modal">
+            <div class="modal-content">
+                <h3>关卡通过！</h3>
+                <div class="victory-stats">
+                    <p>得分: <span id="victory-score">0</span></p>
+                    <p>剩余飞刀奖励: <span id="bonus-score">0</span></p>
+                </div>
+                <button id="btn-next-level" class="neon-btn primary">
+                    <span>下一关</span>
+                </button>
+                <button id="btn-chest" class="neon-btn">
+                    <span>看广告开宝箱</span>
+                </button>
+            </div>
+        </div>
+        
+        <div id="chest-modal" class="modal">
+            <div class="modal-content">
+                <h3>恭喜获得皮肤！</h3>
+                <div id="chest-reward" class="chest-reward">
+                    <div class="skin-preview"></div>
+                    <p id="skin-name">霓虹飞刀</p>
+                </div>
+                <button id="btn-close-chest" class="neon-btn primary">
+                    <span>确定</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="audio.js"></script>
+    <script src="levels.js"></script>
+    <script src="ui.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

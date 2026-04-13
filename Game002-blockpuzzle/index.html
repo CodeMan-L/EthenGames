@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>ネオンブロックパズル | Neon Block Puzzle</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <button id="sound-toggle-btn" class="sound-toggle" onclick="toggleSound()">🔊</button>
+
+        <div id="home-page" class="page active">
+            <h1 class="game-title">ネオンブロックパズル</h1>
+            <div class="high-score-display">ハイスコア: <span id="high-score">0</span></div>
+            <button class="btn btn-primary" onclick="startGame()">ゲーム開始</button>
+            <button class="btn btn-secondary" onclick="showLevelSelect()">レベル選択</button>
+            <button class="btn" onclick="showSettings()">設定</button>
+            <button class="btn btn-share" onclick="shareToTikTok()">TikTokでシェア</button>
+        </div>
+
+        <div id="settings-page" class="page">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <h2 class="settings-title">設定</h2>
+            <div class="setting-item">
+                <span class="setting-label">効果音</span>
+                <div id="sound-toggle" class="toggle-switch active" onclick="toggleSoundSetting()"></div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">BGM</span>
+                <div id="bgm-toggle" class="toggle-switch active" onclick="toggleBgmSetting()"></div>
+            </div>
+            <button class="btn btn-primary" onclick="resetProgress()" style="margin-top: 30px;">進捗リセット</button>
+        </div>
+
+        <div id="level-select-page" class="page">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <h2 class="settings-title">レベル選択</h2>
+            <div id="level-grid" class="level-grid"></div>
+        </div>
+
+        <div id="game-page" class="page">
+            <div class="game-header">
+                <button class="pause-btn" onclick="pauseGame()">⏸</button>
+                <div class="game-info">
+                    <span class="info-label">レベル</span>
+                    <span id="level-info" class="info-value">1</span>
+                </div>
+                <div class="game-info">
+                    <span class="info-label">時間</span>
+                    <span id="game-time" class="info-value time">60</span>
+                </div>
+                <div class="game-info">
+                    <span class="info-label">スコア</span>
+                    <span id="game-score" class="info-value">0</span>
+                </div>
+                <div class="game-info">
+                    <span class="info-label">目標</span>
+                    <span id="game-target" class="info-value target">500</span>
+                </div>
+                <div class="health-container">
+                    <span class="info-label">HP</span>
+                    <div id="health-display" class="health-display">
+                        <span class="health-heart active">❤️</span>
+                        <span class="health-heart active">❤️</span>
+                        <span class="health-heart active">❤️</span>
+                    </div>
+                </div>
+            </div>
+            <div id="game-board"></div>
+        </div>
+
+        <div id="combo-display" class="combo-display"></div>
+
+        <div id="modal" class="modal">
+            <div id="modal-content" class="modal-content"></div>
+        </div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="levels.js"></script>
+    <script src="ui.js"></script>
+    <script src="game.js"></script>
+    <script>
+        function initGame() {
+            AudioManager.init();
+            LevelManager.init();
+            UI.init();
+            Game.init();
+        }
+
+        function startGame() {
+            AudioManager.playClick();
+            const progress = LevelManager.getProgress();
+            Game.startLevel(progress.currentLevel);
+        }
+
+        function showLevelSelect() {
+            AudioManager.playClick();
+            UI.showPage('level-select');
+        }
+
+        function showSettings() {
+            AudioManager.playClick();
+            UI.showPage('settings');
+        }
+
+        function goHome() {
+            AudioManager.playClick();
+            UI.showPage('home');
+        }
+
+        function toggleSound() {
+            const enabled = AudioManager.toggleSound();
+            document.getElementById('sound-toggle-btn').textContent = enabled ? '🔊' : '🔇';
+            AudioManager.playClick();
+        }
+
+        function toggleSoundSetting() {
+            const enabled = AudioManager.toggleSound();
+            document.getElementById('sound-toggle').classList.toggle('active', enabled);
+            document.getElementById('sound-toggle-btn').textContent = enabled ? '🔊' : '🔇';
+        }
+
+        function toggleBgmSetting() {
+            const enabled = AudioManager.toggleBgm();
+            document.getElementById('bgm-toggle').classList.toggle('active', enabled);
+        }
+
+        function resetProgress() {
+            if (confirm('すべての進捗をリセットしますか？')) {
+                AudioManager.playClick();
+                LevelManager.resetProgress();
+                UI.updateHighScore();
+                alert('進捗をリセットしました！');
+            }
+        }
+
+        function pauseGame() {
+            AudioManager.playClick();
+            Game.pause();
+        }
+
+        function shareToTikTok() {
+            AudioManager.playClick();
+            const shareText = 'ネオンブロックパズルで遊んでるよ！挑戦してみて！';
+            const shareUrl = window.location.href;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'ネオンブロックパズル',
+                    text: shareText,
+                    url: shareUrl
+                }).catch(() => {});
+            } else {
+                const tiktokUrl = 'https://www.tiktok.com/share?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareText);
+                window.open(tiktokUrl, '_blank');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initGame);
+
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('#game-container')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 100);
+        });
+    </script>
+</body>
+</html>
