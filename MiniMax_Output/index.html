@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>游戏中心 - MH Games</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      color: white;
+    }
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+    }
+    .header h1 {
+      font-size: 42px;
+      background: linear-gradient(90deg, #ff6ec7, #a855f7, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    .header p {
+      color: rgba(255,255,255,0.6);
+      font-size: 16px;
+    }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 36px;
+      font-weight: bold;
+      color: #ffd700;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .category-section {
+      margin-bottom: 50px;
+    }
+    .category-title {
+      font-size: 24px;
+      margin-bottom: 25px;
+      padding-left: 15px;
+      border-left: 4px solid #a855f7;
+      color: #fff;
+    }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .game-card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+    }
+    .game-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(168,85,247,0.3);
+      background: rgba(255,255,255,0.12);
+    }
+    .game-icon {
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(59,130,246,0.2));
+    }
+    .game-info {
+      padding: 15px;
+    }
+    .game-name {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .game-category {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+    .game-number {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      background: rgba(168,85,247,0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .back-home {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 12px 28px;
+      background: linear-gradient(90deg, #ff6ec7, #a855f7);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s;
+      z-index: 100;
+      box-shadow: 0 5px 20px rgba(168,85,247,0.4);
+    }
+    .back-home:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(168,85,247,0.6);
+    }
+    .search-bar {
+      max-width: 600px;
+      margin: 0 auto 40px;
+      position: relative;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 15px 50px 15px 25px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 30px;
+      background: rgba(255,255,255,0.05);
+      color: white;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .search-bar input:focus {
+      border-color: #a855f7;
+      background: rgba(255,255,255,0.08);
+    }
+    .search-bar::after {
+      content: '🔍';
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+    }
+    @media (max-width: 768px) {
+      .header h1 { font-size: 32px; }
+      .games-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+      .game-icon { height: 90px; font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎮 MH Games 游戏中心</h1>
+    <p>墨焕科技（上海）- 精品H5小游戏合集</p>
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-number">53</div>
+        <div class="stat-label">精选游戏</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">10</div>
+        <div class="stat-label">游戏分类</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">∞</div>
+        <div class="stat-label">欢乐时光</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="搜索游戏..." oninput="filterGames()">
+    </div>
+
+    <div id="gamesContainer"></div>
+  </div>
+
+  <a href="../home.html" class="back-home">← 返回首页</a>
+
+  <script>
+    const games = [
+      {id: 1, name: "贪吃蛇", category: "经典游戏", icon: "🐍", type: "classic"},
+      {id: 2, name: "俄罗斯方块", category: "益智游戏", icon: "🧱", type: "puzzle"},
+      {id: 3, name: "打地鼠", category: "动作游戏", icon: "🔨", type: "action"},
+      {id: 4, name: "记忆翻牌", category: "记忆游戏", icon: "🃏", type: "memory"},
+      {id: 5, name: "2048", category: "数字游戏", icon: "🔢", type: "puzzle"},
+      {id: 6, name: "弹球游戏", category: "街机游戏", icon: "🎱", type: "arcade"},
+      {id: 7, name: "飞机大战", category: "射击游戏", icon: "✈️", type: "shooter"},
+      {id: 8, name: "跳一跳", category: "休闲游戏", icon: "🦘", type: "action"},
+      {id: 9, name: "消消乐", category: "消除游戏", icon: "💎", type: "match3"},
+      {id: 10, name: "接金币", category: "休闲游戏", icon: "🪙", type: "casual"},
+      {id: 11, name: "猜数字", category: "益智游戏", icon: "🔮", type: "guess"},
+      {id: 12, name: "连连看", category: "消除游戏", icon: "🔗", type: "match"},
+      {id: 13, name: "扫雷", category: "策略游戏", icon: "💣", type: "logic"},
+      {id: 14, name: "乒乓球", category: "体育游戏", icon: "🏓", type: "sports"},
+      {id: 15, name: "躲避障碍", category: "动作游戏", icon: "🏃", type: "avoidance"},
+      {id: 16, name: "拼图游戏", category: "益智游戏", icon: "🧩", type: "puzzle"},
+      {id: 17, name: "打砖块", category: "街机游戏", icon: "🧱", type: "breakout"},
+      {id: 18, name: "泡泡龙", category: "射击游戏", icon: "🫧", type: "bubble"},
+      {id: 19, name: "找不同", category: "观察游戏", icon: "🔍", type: "find"},
+      {id: 20, name: "反应测试", category: "竞技游戏", icon: "⚡", type: "reaction"},
+      {id: 21, name: "迷宫探险", category: "冒险游戏", icon: "🗺️", type: "maze"},
+      {id: 22, name: "算术挑战", category: "教育游戏", icon: "🔢", type: "math"},
+      {id: 23, name: "颜色配对", category: "益智游戏", icon: "🎨", type: "color"},
+      {id: 24, name: "节奏大师", category: "音乐游戏", icon: "🎵", type: "rhythm"},
+      {id: 25, name: "堆叠方块", category: "技巧游戏", icon: "📦", type: "stack"},
+      {id: 26, name: "钓鱼达人", category: "模拟游戏", icon: "🎣", type: "fishing"},
+      {id: 27, name: "切水果", category: "动作游戏", icon: "🍉", type: "slice"},
+      {id: 28, name: "翻牌子", category: "记忆游戏", icon: "🎴", type: "flip"},
+      {id: 29, name: "跑酷小子", category: "动作游戏", icon: "🏃‍♂️", type: "runner"},
+      {id: 30, name: "填字游戏", category: "文字游戏", icon: "📝", type: "word"},
+      {id: 31, name: "射击训练", category: "射击游戏", icon: "🎯", type: "target"},
+      {id: 32, name: "平衡球", category: "技巧游戏", icon: "⚖️", type: "balance"},
+      {id: 33, name: "接苹果", category: "休闲游戏", icon: "🍎", type: "catch"},
+      {id: 34, name: "记忆序列", category: "记忆游戏", icon: "🧠", type: "sequence"},
+      {id: 35, name: "弹跳球", category: "物理游戏", icon: "⚽", type: "bounce"},
+      {id: 36, name: "赛车竞速", category: "竞速游戏", icon: "🏎️", type: "racing"},
+      {id: 37, name: "解谜冒险", category: "冒险游戏", icon: "🗝️", type: "adventure"},
+      {id: 38, name: "打气球", category: "动作游戏", icon: "🎈", type: "balloon"},
+      {id: 39, name: "数字华容道", category: "益智游戏", icon: "🔢", type: "sliding"},
+      {id: 40, name: "石头剪刀布", category: "休闲游戏", icon: "✊", type: "rps"},
+      {id: 41, name: "塔防小游戏", category: "策略游戏", icon: "🏰", type: "tower"},
+      {id: 42, name: "合成大西瓜", category: "消除游戏", icon: "🍉", type: "merge"},
+      {id: 43, name: "飞行棋", category: "棋类游戏", icon: "✈️", type: "board"},
+      {id: 44, name: "画线闯关", category: "创意游戏", icon: "✏️", type: "draw"},
+      {id: 45, name: "重力小球", category: "物理游戏", icon: "🌍", type: "gravity"},
+      {id: 46, name: "成语接龙", category: "文字游戏", icon: "📚", type: "idiom"},
+      {id: 47, name: "太空射击", category: "射击游戏", icon: "🚀", type: "space"},
+      {id: 48, name: "忍者切切", category: "动作游戏", icon: "🥷", type: "ninja"},
+      {id: 49, name: "宠物养成", category: "模拟游戏", icon: "🐾", type: "pet"},
+      {id: 50, name: "终极挑战", category: "综合游戏", icon: "🏆", type: "ultimate"},
+      {id: 51, name: "拉杆子过关", category: "技巧游戏", icon: "🏗️", type: "stick", url: "games/laganziguoguan/index.html"},
+      {id: 52, name: "射箭游戏", category: "射击游戏", icon: "🏹", type: "archery", url: "games/shejian.html/shejian.html"},
+      {id: 53, name: "视觉差贪吃蛇", category: "休闲游戏", icon: "🐍", type: "snake", url: "games/tan.html/tan.html"}
+    ];
+
+    function renderGames(gamesToRender) {
+      const container = document.getElementById('gamesContainer');
+      const categories = {};
+
+      gamesToRender.forEach(game => {
+        if (!categories[game.category]) {
+          categories[game.category] = [];
+        }
+        categories[game.category].push(game);
+      });
+
+      let html = '';
+      Object.keys(categories).forEach(category => {
+        html += `<div class="category-section">
+          <h2 class="category-title">${category}</h2>
+          <div class="games-grid">`;
+
+        categories[category].forEach(game => {
+          const gameUrl = game.url || `games/game_${String(game.id).padStart(2, '0')}_${game.name}.html`;
+          html += `
+            <a href="${gameUrl}" class="game-card">
+              <div class="game-icon">${game.icon}</div>
+              <div class="game-info">
+                <div class="game-name">${game.name}</div>
+                <div class="game-category">#${String(game.id).padStart(2, '0')}</div>
+              </div>
+              <div class="game-number">${game.id}</div>
+            </a>`;
+        });
+
+        html += `</div></div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function filterGames() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = games.filter(game =>
+        game.name.toLowerCase().includes(searchTerm) ||
+        game.category.toLowerCase().includes(searchTerm)
+      );
+      renderGames(filtered);
+    }
+
+    renderGames(games);
+  </script>
+</body>
+</html>

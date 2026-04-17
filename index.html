@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>墨焕科技 - 游戏工作室</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+.loading-container{position:fixed;top:0;left:0;width:100vw;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;background:radial-gradient(ellipse at center,#0a0a1a 0%,#000005 70%,#000 100%);z-index:9999;transition:opacity 1.2s cubic-bezier(.4,0,.2,1),visibility 1.2s ease}
+.loading-container.fade-out{opacity:0;visibility:hidden}
+.logo-wrapper{position:relative;margin-bottom:50px;width:85vw;max-width:700px}
+@media(max-width:768px){.logo-wrapper{max-width:350px}}
+@media(max-width:480px){.logo-wrapper{max-width:280px}.loading-bar-container{width:200px}}
+
+.logo-svg{width:100%;height:auto;overflow:visible}
+
+.mh-group,.games-group{opacity:0}
+
+.hm-path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.5;stroke:#fff}
+.mh-path{stroke-width:2.8}
+.games-path{stroke-width:2.2}
+
+.loading-bar-container{width:320px;height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;opacity:0;position:relative}
+.loading-bar-container::before{content:'';position:absolute;inset:-2px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.3),transparent);border-radius:6px;animation:bar-scan 2s linear infinite}
+@keyframes bar-scan{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.loading-bar{height:100%;width:0%;background:linear-gradient(90deg,#ff6ec7,#a855f7,#3b82f6,#06b6d4);background-size:200% 100%;border-radius:4px;box-shadow:0 0 20px rgba(168,85,247,.5);position:relative}
+.loading-bar::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:12px;height:12px;background:#fff;border-radius:50%;box-shadow:0 0 15px #fff,0 0 30px rgba(168,85,247,.8);animation:pulse-dot .8s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{transform:translateY(-50%) scale(1);opacity:1}50%{transform:translateY(-50%) scale(1.5);opacity:.7}}
+
+.loading-text{margin-top:25px;font-size:13px;color:rgba(255,255,255,.5);letter-spacing:6px;text-transform:uppercase;opacity:0;font-weight:300}
+
+.particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.particle{position:absolute;border-radius:50%;pointer-events:none;will-change:transform,opacity,box-shadow}
+
+.bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(168,85,247,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(168,85,247,.03) 1px,transparent 1px);background-size:60px 60px;z-index:0;animation:grid-move 20s linear infinite;pointer-events:none}
+@keyframes grid-move{0%{transform:perspective(500px) rotateX(60deg) translateY(0)}100%{transform:perspective(500px) rotateX(60deg) translateY(60px)}}
+
+.aurora{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.4;overflow:hidden}
+.aurora-beam{position:absolute;width:200%;height:200%;top:-50%;left:-50%;background:conic-gradient(from var(--angle,0deg),transparent 0deg,rgba(168,85,247,.08) 60deg,rgba(255,110,199,.06) 120deg,transparent 180deg,rgba(59,130,246,.08) 240deg,transparent 300deg,rgba(168,85,247,.08) 360deg);animation:aurora-rotate 15s linear infinite,aurora-pulse 8s ease-in-out infinite}
+@keyframes aurora-rotate{to{--angle:360deg}}
+@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes aurora-pulse{0%,100%{opacity:.3;transform:scale(1) rotate(0deg)}50%{opacity:.6;transform:scale(1.1) rotate(5deg)}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="aurora">
+  <div class="aurora-beam" style="--angle:0deg"></div>
+  <div class="aurora-beam" style="--angle:120deg;animation-delay:-5s"></div>
+  <div class="aurora-beam" style="--angle:240deg;animation-delay:-10s"></div>
+</div>
+<div class="particles" id="particles"></div>
+
+<div class="loading-container" id="loadingContainer">
+  <div class="logo-wrapper">
+    <svg class="logo-svg" viewBox="0 0 750 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="grad-mh" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#ff6ec7"/>
+          <stop offset="50%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
+        <linearGradient id="grad-games" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#f97316"/>
+          <stop offset="33%" stop-color="#eab308"/>
+          <stop offset="66%" stop-color="#22c55e"/>
+          <stop offset="100%" stop-color="#06b6d4"/>
+        </linearGradient>
+        <linearGradient id="grad-rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#ff6ec7">
+            <animate attributeName="stop-color" values="#ff6ec7;#a855f7;#3b82f6;#06b6d4;#ff6ec7" dur="3s" repeatCount="indefinite"/>
+          </stop>
+          <stop offset="50%" stop-color="#a855f7">
+            <animate attributeName="stop-color" values="#a855f7;#3b82f6;#06b6d4;#ff6ec7;#a855f7" dur="3s" repeatCount="indefinite"/>
+          </stop>
+          <stop offset="100%" stop-color="#3b82f6">
+            <animate attributeName="stop-color" values="#3b82f6;#06b6d4;#ff6ec7;#a855f7;#3b82f6" dur="3s" repeatCount="indefinite"/>
+          </stop>
+        </linearGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b1"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b2"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="b3"/>
+          <feMerge><feMergeNode in="b3"/><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-strong" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b1"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b2"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="b3"/>
+          <feMerge><feMergeNode in="b3"/><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <g transform="translate(20, 7)">
+        <g class="mh-group" id="mhGroup">
+          <path class="hm-path mh-path" id="mhPath1" d="M154.03 0.5L153.935 1.08203L147.667 38.9092H186.608L192.902 0.917969L192.972 0.5H213.622L213.525 1.08203L198.07 94.1729L198.001 94.5908H177.352L177.448 94.0098L183.715 56.1367H144.774L138.48 94.1729L138.41 94.5908H117.715L117.812 94.0088L133.266 0.917969L133.335 0.5H154.03Z"/>
+          <path class="hm-path mh-path" id="mhPath2" d="M41.2988 0.5L41.3926 0.880859L56.6172 63.0459H57.0264L92.8369 0.750977L92.9815 0.5H118.133L118.036 1.08203L102.582 94.1729L102.513 94.5908H82.4072L82.5049 94.0088L92.4717 34.1592L58.7061 93.8828L58.5625 94.1367H44.8281L44.7383 93.749L30.8555 33.8906L20.7637 94.1738L20.6944 94.5908H0.589859L0.686539 94.0088L16.1406 0.917969L16.21 0.5H41.2988Z"/>
+        </g>
+      </g>
+
+      <g transform="translate(275, 6)">
+        <g class="games-group" id="gamesGroup">
+          <path class="hm-path games-path" id="gPath1" d="M399.764 24.1364C408.88 24.1364 415.832 26.0093 420.533 29.8385L420.97 30.2018C425.411 34.0016 427.52 39.1108 427.31 45.4713L427.294 45.9254L426.841 45.9538L409.249 47.0446L408.749 47.0758L408.72 46.5749C408.633 45.1059 408.231 43.8097 407.521 42.6745L407.518 42.6676L407.515 42.6618C406.841 41.5108 405.84 40.5889 404.491 39.9001L404.487 39.8981C403.185 39.2188 401.513 38.8639 399.445 38.8639C396.343 38.864 393.598 39.5722 391.198 40.9772C388.808 42.3763 387.519 44.1235 387.213 46.2086L387.212 46.2184L387.21 46.2282C386.967 47.524 387.298 48.5807 388.203 49.4596C389.123 50.3526 391.071 51.1781 394.183 51.8737H394.184L406.456 54.4196H406.459V54.4206C413.055 55.8252 417.899 58.1757 420.907 61.528L421.188 61.8473C424.035 65.1831 425.007 69.481 424.167 74.6706L424.166 74.6745C423.392 79.2279 421.391 83.2119 418.173 86.6159L418.171 86.6178C414.961 89.9816 410.896 92.5961 405.987 94.4674L405.985 94.4684C401.073 96.3104 395.634 97.2272 389.673 97.2272C380.131 97.2272 372.79 95.2778 367.728 91.3024C362.656 87.3195 360.215 81.9066 360.4 75.1227L360.413 74.6618L360.874 74.6374L379.783 73.6374L380.282 73.611L380.309 74.11C380.454 76.8457 381.405 78.8483 383.114 80.195L383.448 80.4381C385.154 81.6178 387.458 82.2453 390.405 82.2731H390.409C393.72 82.3287 396.53 81.6928 398.86 80.3893L399.32 80.1198C401.783 78.5952 403.1 76.798 403.405 74.7448L403.406 74.7419C403.624 73.3264 403.223 72.2319 402.215 71.3825L402.21 71.3786C401.191 70.4976 399.24 69.7135 396.254 69.0797V69.0807L384.617 66.6715C377.951 65.2955 373.084 62.8182 370.104 59.1803C367.115 55.5303 366.116 50.9055 367.044 45.3717L367.195 44.5495C368.021 40.4732 369.816 36.945 372.58 33.9772C375.55 30.7906 379.363 28.3565 384.002 26.6667H384.003C388.672 24.9771 393.928 24.1364 399.764 24.1364Z"/>
+          <path class="hm-path games-path" id="gPath2" d="M326.73 24.1364C331.388 24.1364 335.617 24.887 339.41 26.3971C343.242 27.8806 346.434 30.1412 348.975 33.1774L349.444 33.7506C351.736 36.6628 353.308 40.2321 354.173 44.442L354.341 45.2946C355.123 49.6019 355.048 54.5639 354.132 60.1715L353.269 65.4889L353.201 65.9088H305.647L305.631 65.9977C305.035 69.6101 305.164 72.5594 305.973 74.8747L306.137 75.3024C306.995 77.4051 308.379 78.9853 310.293 80.0641H310.292C312.348 81.1925 314.985 81.7731 318.23 81.7731C320.334 81.7731 322.297 81.476 324.121 80.8874H324.124C325.979 80.2987 327.621 79.4324 329.055 78.2907C330.483 77.1241 331.651 75.6785 332.56 73.9489L332.711 73.6608L333.036 73.6833L350.718 74.8649L351.392 74.9098L351.152 75.5417C349.489 79.9139 346.963 83.7338 343.577 86.9967L343.576 86.9977C340.19 90.2295 336.116 92.7488 331.363 94.5583L331.361 94.5592C326.629 96.3411 321.341 97.2272 315.502 97.2272C308.285 97.2272 302.262 95.7592 297.466 92.7887L297.464 92.7878C292.669 89.7869 289.296 85.5433 287.35 80.0768L287.349 80.0739C285.435 74.5797 285.121 68.111 286.373 60.6891C287.596 53.445 290.059 47.0733 293.77 41.5836L293.771 41.5817C297.511 36.0942 302.207 31.8124 307.855 28.7428C313.51 25.6696 319.805 24.1364 326.73 24.1364ZM324.776 39.5905C322.013 39.5905 319.43 40.2658 317.02 41.6178C314.596 42.9777 312.559 44.7648 310.904 46.9811L310.903 46.9801C309.533 48.8233 308.579 50.7995 308.031 52.9088H336.027C336.386 50.3626 336.185 48.1236 335.445 46.1774C334.664 44.1249 333.369 42.5298 331.553 41.3766L331.548 41.3737C329.737 40.1949 327.488 39.5906 324.776 39.5905Z"/>
+          <path class="hm-path games-path" id="gPath3" d="M258.48 24.1364C265.051 24.1364 270.146 26.2558 273.684 30.5456C277.234 34.8498 278.304 40.866 277.018 48.4919L269.201 95.446L269.131 95.8639H248.753L248.85 95.2809L256.123 52.1442C256.686 48.3085 256.1 45.5839 254.518 43.8356L254.515 43.8327C252.901 42.0202 250.64 41.0905 247.662 41.0905C244.264 41.0905 241.467 42.1703 239.235 44.3151L239.233 44.317C236.992 46.4416 235.597 49.2588 235.065 52.8014L235.064 52.8112L227.837 95.4469L227.766 95.8639H207.979L208.078 95.2799L215.441 51.735C215.941 48.3734 215.383 45.8074 213.866 43.9528L213.86 43.9469C212.371 42.0651 210.125 41.0905 207.025 41.0905C204.994 41.0905 203.065 41.6124 201.228 42.6618L201.225 42.6628C199.42 43.6819 197.885 45.1264 196.622 47.0065L196.62 47.0094C195.364 48.8491 194.54 51.0189 194.156 53.5299L194.155 53.5378L187.064 95.4469L186.993 95.8639H166.663L166.759 95.2819L178.396 25.4635L178.466 25.0456H197.885L197.792 25.6256L195.934 37.0592C198.071 33.1622 200.983 30.0581 204.67 27.7575L204.672 27.7565C208.574 25.3411 212.954 24.1364 217.799 24.1364C222.609 24.1365 226.575 25.3556 229.653 27.8346L229.941 28.067C232.762 30.4022 234.434 33.5038 234.963 37.3395C237.07 33.3863 240.194 30.2192 244.321 27.8395C248.553 25.3686 253.277 24.1364 258.48 24.1364Z"/>
+          <path class="hm-path games-path" id="gPath4" d="M134.276 24.1364C138.193 24.1364 141.859 24.5955 145.27 25.5172H145.269C148.717 26.4411 151.703 27.8767 154.216 29.8307C156.776 31.7978 158.62 34.3295 159.743 37.4147L159.949 37.9977C160.928 40.947 161.084 44.4049 160.45 48.3522V48.3551L152.587 95.446L152.517 95.8639H133.138L133.236 95.2799L134.679 86.7448C133.273 88.6515 131.603 90.3541 129.672 91.8503L129.669 91.8522C127.471 93.5242 124.951 94.8364 122.116 95.7917L122.112 95.7936C119.267 96.7216 116.092 97.1822 112.594 97.1823C108.112 97.1823 104.201 96.3991 100.878 94.8151L100.873 94.8122C97.5659 93.1897 95.1198 90.7781 93.5538 87.5836C91.9793 84.3717 91.6044 80.4253 92.3732 75.7819V75.779C93.0496 71.8432 94.331 68.5268 96.2316 65.8473V65.8463C98.1493 63.1553 100.489 60.9861 103.247 59.3434C105.988 57.7115 109.016 56.4665 112.331 55.6071H112.333C115.661 54.7522 119.094 54.1714 122.633 53.8659L125.532 53.5514C128.289 53.2395 130.616 52.9363 132.517 52.6422H132.518C135.072 52.2515 136.925 51.702 138.118 51.0202C139.249 50.3444 139.932 49.3619 140.185 48.0378V47.779L140.191 47.7389C140.629 44.9917 140.107 42.9564 138.734 41.528L138.727 41.5211C137.375 40.0591 135.16 39.2731 131.957 39.2731C128.578 39.2731 125.735 40.0122 123.405 41.4674C121.086 42.9356 119.446 44.7876 118.46 47.0202L118.317 47.3454L117.961 47.3161L100.325 45.862L99.6681 45.8073L99.8976 45.1891C101.399 41.1481 103.619 37.6171 106.557 34.6012L107.154 34.0045C110.42 30.8314 114.345 28.4015 118.92 26.7126C123.499 24.992 128.62 24.1364 134.276 24.1364ZM137.579 63.904C137.05 64.1343 136.429 64.3426 135.721 64.529L135.72 64.528C134.588 64.8338 133.352 65.1249 132.012 65.3991L132.003 65.401C130.696 65.6443 129.373 65.8718 128.035 66.0846L128.025 66.0866C126.696 66.2678 125.504 66.4489 124.45 66.6295L124.437 66.6315C122.135 66.9603 120.083 67.4824 118.276 68.193C116.486 68.8975 115.052 69.8435 113.96 71.0221L113.956 71.026C112.882 72.1564 112.21 73.5741 111.951 75.3014L111.95 75.3063C111.547 77.8146 112.142 79.6347 113.641 80.8883C115.22 82.1543 117.442 82.818 120.366 82.818C122.944 82.818 125.318 82.3381 127.492 81.3825L127.925 81.1842C130.255 80.0631 132.163 78.5638 133.657 76.6881L133.66 76.6842C135.181 74.813 136.144 72.6976 136.554 70.3307L137.579 63.904Z"/>
+          <path class="hm-path games-path" id="gPath5" d="M53.4453 0.5C58.7667 0.5 63.5985 1.27971 67.9336 2.84766H67.9326C72.2904 4.38243 76.0306 6.56536 79.1445 9.40137L79.7256 9.93945C82.5842 12.6626 84.7666 15.862 86.2705 19.5332L86.5664 20.2676C87.9971 23.9611 88.6513 27.9997 88.5361 32.377L88.5234 32.8633H67.5889L67.54 32.418C67.3025 30.2502 66.7991 28.3501 66.0381 26.7109L66.0332 26.7012C65.303 25.0363 64.2994 23.6418 63.0234 22.5107L63.0186 22.5068C61.7425 21.3458 60.1837 20.4548 58.333 19.8379C56.4858 19.2222 54.3287 18.9092 51.8545 18.9092C47.1846 18.9092 42.8153 20.0673 38.7393 22.3877C34.6962 24.7066 31.2376 28.0873 28.3662 32.5439L28.3652 32.5449C25.5014 36.96 23.5363 42.3759 22.4844 48.8076V48.8105C21.4007 55.2526 21.407 60.6947 22.4766 65.1533L22.6943 65.9766C23.8365 70.0258 25.8151 73.1159 28.6113 75.2832L28.8965 75.4941C31.8702 77.6375 35.6774 78.7275 40.3545 78.7275C44.7493 78.7275 48.6787 77.9496 52.1514 76.4062C55.6253 74.832 58.4518 72.6255 60.6406 69.7861L60.6426 69.7832C62.6336 67.2347 63.9828 64.2641 64.6895 60.8633H44.7656L44.8613 60.2822L47.3164 45.4639L47.3857 45.0459H87.3564L87.2568 45.6299L85.2568 57.3506C83.9426 65.6027 81.0515 72.7122 76.5723 78.6641C72.1 84.6067 66.5217 89.173 59.8428 92.3594C53.1946 95.5455 45.9085 97.1367 37.9912 97.1367C29.19 97.1367 21.742 95.1955 15.6748 91.2842L15.6729 91.2822C9.63547 87.3394 5.34217 81.7477 2.79297 74.5303L2.79199 74.5273C0.272685 67.2765 -0.163246 58.7034 1.45215 48.8281L1.69824 47.4141C2.98486 40.3912 5.13093 34.0815 8.1416 28.4902L8.14258 28.4893C11.3799 22.5034 15.339 17.4258 20.0225 13.2627C24.7027 9.10244 29.8915 5.93347 35.5859 3.75977H35.5869C41.3106 1.58666 47.2644 0.500056 53.4453 0.5Z"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="loading-bar-container" id="loadingBarContainer">
+    <div class="loading-bar" id="loadingBar"></div>
+  </div>
+  <div class="loading-text" id="loadingText">Loading Experience</div>
+</div>
+
+<script>
+(function() {
+  const mhGroup = document.getElementById('mhGroup');
+  const gamesGroup = document.getElementById('gamesGroup');
+  const mhPaths = document.querySelectorAll('.mh-path');
+  const gamesPaths = document.querySelectorAll('.games-path');
+  const allPaths = document.querySelectorAll('.hm-path');
+  const loadingBarContainer = document.getElementById('loadingBarContainer');
+  const loadingBar = document.getElementById('loadingBar');
+  const loadingText = document.getElementById('loadingText');
+
+  function getLength(path) {
+    try { return path.getTotalLength(); } catch(e) { return 2000; }
+  }
+
+  mhPaths.forEach(p => {
+    const len = getLength(p);
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+  gamesPaths.forEach(p => {
+    const len = getLength(p);
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+
+  function animate(el, props, duration, easing, delay) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        el.style.transition = `all ${duration}ms ${easing || 'cubic-bezier(0.4,0,0.2,1)'}`;
+        Object.keys(props).forEach(k => el.style[k] = props[k]);
+        setTimeout(resolve, duration);
+      }, delay || 0);
+    });
+  }
+
+  function animatePath(path, duration, delay) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        path.style.transition = `stroke-dashoffset ${duration}ms cubic-bezier(0.65,0,0.35,1)`;
+        path.style.strokeDashoffset = '0';
+        setTimeout(resolve, duration);
+      }, delay || 0);
+    });
+  }
+
+  function flicker(el, times, interval) {
+    return new Promise(resolve => {
+      let count = 0;
+      const timer = setInterval(() => {
+        el.style.opacity = count % 2 === 0 ? '0.2' : '1';
+        count++;
+        if (count >= times) {
+          clearInterval(timer);
+          el.style.opacity = '1';
+          resolve();
+        }
+      }, interval);
+    });
+  }
+
+  async function runAnimation() {
+    // ===== PHASE 1: MH 居中渐显 =====
+    // MH outer: translate(20,7), MH width=215, center at 20+107.5=127.5
+    // ViewBox center: 375. Need translateX(375-127.5)=247.5 on inner group
+    mhGroup.style.opacity = '0';
+    mhGroup.style.transform = 'translateX(247.5px) scale(0.9)';
+    mhGroup.style.filter = 'blur(10px)';
+    mhGroup.style.transition = 'none';
+
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    await animate(mhGroup, { opacity: '1', filter: 'blur(0px)', transform: 'translateX(247.5px) scale(1)' }, 1000, 'cubic-bezier(0.16,1,0.3,1)', 300);
+
+    // ===== PHASE 2: MH 线条描绘 =====
+    await Promise.all([
+      animatePath(mhPaths[0], 1200, 0),
+      animatePath(mhPaths[1], 1200, 200)
+    ]);
+
+    // ===== PHASE 3: MH 向左移动到最终位置 =====
+    await animate(mhGroup, { transform: 'translateX(0px) scale(1)' }, 800, 'cubic-bezier(0.16,1,0.3,1)', 0);
+
+    // ===== PHASE 4: Games 从右快速滑入 + 闪烁 =====
+    // Games outer: translate(275,6), Games width=428, right edge at 275+428=703
+    // translateX(750) puts Games completely off-screen right
+    gamesGroup.style.opacity = '0';
+    gamesGroup.style.transform = 'translateX(750px)';
+    gamesGroup.style.transition = 'none';
+
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    await animate(gamesGroup, { opacity: '1', transform: 'translateX(0px)' }, 400, 'cubic-bezier(0.16,1,0.3,1)', 0);
+
+    // Games 线条快速描绘
+    await Promise.all([
+      animatePath(gamesPaths[0], 500, 0),
+      animatePath(gamesPaths[1], 500, 80),
+      animatePath(gamesPaths[2], 500, 160),
+      animatePath(gamesPaths[3], 500, 240),
+      animatePath(gamesPaths[4], 500, 320)
+    ]);
+
+    // 闪烁效果
+    await flicker(gamesGroup, 6, 60);
+
+    // ===== PHASE 5: 整体渐变色 (4.2s - 5s) =====
+    await new Promise(resolve => {
+      mhPaths.forEach(p => {
+        p.style.transition = 'stroke 0.6s ease, filter 0.6s ease';
+        p.style.stroke = 'url(#grad-mh)';
+        p.style.filter = 'url(#glow)';
+      });
+      gamesPaths.forEach(p => {
+        p.style.transition = 'stroke 0.6s ease, filter 0.6s ease';
+        p.style.stroke = 'url(#grad-games)';
+        p.style.filter = 'url(#glow-strong)';
+      });
+      setTimeout(resolve, 800);
+    });
+
+    // ===== PHASE 6: 线条重构 - 消失再重绘 (5s - 6.5s) =====
+    // 先让线条消失
+    await new Promise(resolve => {
+      allPaths.forEach(p => {
+        p.style.transition = 'stroke-dashoffset 0.5s ease, opacity 0.3s ease';
+        p.style.strokeDashoffset = getLength(p);
+        p.style.opacity = '0.3';
+      });
+      setTimeout(resolve, 600);
+    });
+
+    // 重绘线条
+    await new Promise(resolve => {
+      allPaths.forEach((p, i) => {
+        setTimeout(() => {
+          p.style.transition = 'stroke-dashoffset 0.8s cubic-bezier(0.65,0,0.35,1), opacity 0.3s ease';
+          p.style.strokeDashoffset = '0';
+          p.style.opacity = '1';
+        }, i * 80);
+      });
+      setTimeout(resolve, 1200);
+    });
+
+    // ===== PHASE 7: 变色 - 全部变成彩虹渐变 (6.5s - 7s) =====
+    allPaths.forEach(p => {
+      p.style.transition = 'stroke 0.5s ease';
+      p.style.stroke = 'url(#grad-rainbow)';
+      p.style.filter = 'url(#glow-strong)';
+    });
+
+    // ===== 显示加载条和文字 =====
+    loadingBarContainer.style.transition = 'opacity 0.6s ease';
+    loadingBarContainer.style.opacity = '1';
+    loadingBar.style.transition = 'width 1.5s cubic-bezier(0.4,0,0.2,1)';
+    loadingBar.style.width = '100%';
+
+    loadingText.style.transition = 'opacity 0.6s ease';
+    loadingText.style.opacity = '1';
+  }
+
+  runAnimation();
+
+  // Particle System
+  class ParticleSystem {
+    constructor() {
+      this.particles = [];
+      this.mouseX = 0;
+      this.mouseY = 0;
+      this.container = document.getElementById('particles');
+      this.isMobile = window.innerWidth < 768;
+      this.lastFrame = 0;
+      this.init();
+    }
+    init() {
+      this.createParticles();
+      this.bindEvents();
+      this.animate();
+    }
+    createParticles() {
+      const count = this.isMobile ? 30 : 50;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 3 + 1.5;
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        const hue = [320, 270, 220, 190, 280][Math.floor(Math.random() * 5)];
+        const dur = Math.random() * 25 + 20;
+        const delay = Math.random() * 15;
+        p.style.cssText = `width:${size}px;height:${size}px;left:${x}%;top:${y}%;background:hsla(${hue},85%,65%,${Math.random()*0.4+0.2});animation:float-${i%4} ${dur}s ease-in-out ${delay}s infinite;box-shadow:0 0 ${size*2}px hsla(${hue},85%,65%,0.3)`;
+        this.container.appendChild(p);
+        this.particles.push({ el: p, x, y, size, hue, baseOpacity: Math.random()*0.4+0.2 });
+      }
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes float-0{0%,100%{transform:translate(0,0) scale(1);opacity:.3}25%{transform:translate(25px,-40px) scale(1.3);opacity:.7}50%{transform:translate(-15px,-80px) scale(.9);opacity:.4}75%{transform:translate(30px,-120px) scale(1.2);opacity:.6}}
+        @keyframes float-1{0%,100%{transform:translate(0,0) scale(1);opacity:.35}33%{transform:translate(-30px,-50px) scale(1.4);opacity:.8}66%{transform:translate(20px,-100px) scale(.8);opacity:.35}}
+        @keyframes float-2{0%,100%{transform:translate(0,0) scale(.95);opacity:.4}50%{transform:translate(28px,-70px) scale(1.5);opacity:.9}}
+        @keyframes float-3{0%,100%{transform:translate(0,0) scale(1);opacity:.3}25%{transform:translate(-20px,-35px) scale(1.2);opacity:.6}50%{transform:translate(15px,-65px) scale(.85);opacity:.35}75%{transform:translate(-25px,-95px) scale(1.3);opacity:.7}}
+      `;
+      document.head.appendChild(style);
+    }
+    bindEvents() {
+      document.addEventListener('mousemove', e => { this.mouseX = e.clientX; this.mouseY = e.clientY; });
+      document.addEventListener('touchmove', e => { if(e.touches.length>0){this.mouseX=e.touches[0].clientX;this.mouseY=e.touches[0].clientY;} });
+    }
+    animate() {
+      const now = performance.now();
+      if (now - this.lastFrame < 30) { requestAnimationFrame(() => this.animate()); return; }
+      this.lastFrame = now;
+      this.particles.forEach(p => {
+        const dx = this.mouseX - (p.x/100*window.innerWidth);
+        const dy = this.mouseY - (p.y/100*window.innerHeight);
+        const dist = Math.sqrt(dx*dx+dy*dy);
+        if (dist < 180) {
+          const force = (180-dist)/180;
+          p.x -= (dx/dist)*force*1.2;
+          p.y -= (dy/dist)*force*1.2;
+          const scale = 1+force*0.6;
+          const glow = p.size*3*(1+force);
+          p.el.style.transform = `scale(${scale})`;
+          p.el.style.background = `hsla(${p.hue},95%,70%,${p.baseOpacity+force*0.5})`;
+          p.el.style.boxShadow = `0 0 ${glow}px hsla(${p.hue},95%,70%,${0.4+force*0.4})`;
+        } else {
+          p.el.style.transform = '';
+          p.el.style.background = `hsla(${p.hue},85%,65%,${p.baseOpacity})`;
+          p.el.style.boxShadow = `0 0 ${p.size*2}px hsla(${p.hue},85%,65%,0.2)`;
+        }
+        p.x = Math.max(0,Math.min(100,p.x));
+        p.y = Math.max(0,Math.min(100,p.y));
+        p.el.style.left = `${p.x}%`;
+        p.el.style.top = `${p.y}%`;
+      });
+      requestAnimationFrame(() => this.animate());
+    }
+  }
+
+  new ParticleSystem();
+
+  setTimeout(() => {
+    const c = document.getElementById('loadingContainer');
+    if (!c.classList.contains('fade-out')) {
+      c.classList.add('fade-out');
+      setTimeout(() => { window.location.href = 'home.html'; }, 1200);
+    }
+  }, 9000);
+})();
+</script>
+</body>
+</html>
