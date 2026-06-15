@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../src/lib/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model Drama {
+  id          String     @id @unique
+  title       String
+  cover       String
+  description String
+  category    String[]
+  region      String
+  year        Int
+  rating      Float
+  updateStatus String
+  views       BigInt
+  tags        String[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  episodes    Episode[]
+}
+
+model Episode {
+  id       String  @id @unique
+  dramaId  String
+  episodeNumber Int
+  title    String
+  duration String
+  playUrl  String
+  drama    Drama   @relation(fields: [dramaId], references: [id])
+  
+  @@unique([dramaId, episodeNumber])
+}
